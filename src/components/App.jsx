@@ -18,17 +18,18 @@ export const App = () => {
   const [isShown, setIsShown] = useState(false);
   const [isLoadMore, setIsLoadMore] = useState(false);
   const [currentImage, setCurrentImage] = useState(null);
-  const [error, setError] = useState(null);
+  const [fetchError, setFetchError] = useState(null);
  
 
   useEffect(() => {
-    if (page !== page || q !== '') {
+    if (page !== 1 || q !== '') {
       getImage();
     }
   }, [page, q]);
 
   
 
+  
   const getImage = () => {
     if (q !== '') {
       setIsLoading(true);
@@ -39,12 +40,13 @@ export const App = () => {
           hits.length === 0 && Notify.failure('Image note found..');
           setResponse([...response, ...imageMapper(hits)]);
           setIsShown(true);
-          setError('');
+          setFetchError('');
           
         })
         .catch(error => {
-          setError(error.message);
+          setFetchError(error.message);
           setIsShown(false);
+          console.log(fetchError);
         })
         .finally(() => setIsLoading(false));
     } else {
