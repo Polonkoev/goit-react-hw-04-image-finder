@@ -23,39 +23,39 @@ export const App = () => {
 
   useEffect(() => {
     if (page !== 1 || q !== '') {
-      getImage();
+      if (q !== '') {
+        setIsLoading(true);
+  
+        fetchImages(page, q)
+          .then(({ data: { hits } }) => {
+            hits.length >= 12 ? setIsLoadMore(true) : setIsLoadMore(false);
+            hits.length === 0 && Notify.failure('Image note found..');
+            setResponse((response)=>[...response, ...imageMapper(hits)]);
+            setIsShown(true);
+            
+            
+          })
+          .catch(error => {
+            setFetchError(error.message);
+            setIsShown(false);
+            
+          })
+          .finally(() => setIsLoading(false));
+      } else {
+        setIsLoadMore(false);
+  
+        return;
+      }
     }
   }, [page, q]);
 
+  useEffect(()=>{
+    if(fetchError !== null){
+    Notify.failure(`Houston we have some "${fetchError}" problems...`)}
+  },[fetchError])
   
 
   
-  const getImage = () => {
-    if (q !== '') {
-      setIsLoading(true);
-
-      fetchImages(page, q)
-        .then(({ data: { hits } }) => {
-          hits.length >= 12 ? setIsLoadMore(true) : setIsLoadMore(false);
-          hits.length === 0 && Notify.failure('Image note found..');
-          setResponse([...response, ...imageMapper(hits)]);
-          setIsShown(true);
-          setFetchError('');
-          
-        })
-        .catch(error => {
-          setFetchError(error.message);
-          setIsShown(false);
-          console.log(fetchError);
-        })
-        .finally(() => setIsLoading(false));
-    } else {
-      setIsLoadMore(false);
-
-      return;
-    }
-  };
-
   const dataHandler = data => {
     setQ(data);
     setPage(1);
