@@ -38,7 +38,8 @@ export const App = () => {
           .catch(error => {
             setFetchError(error.message);
             setIsShown(false);
-            
+            if(fetchError !== null){
+              Notify.failure(`Houston we have some "${fetchError}" problems...`)}
           })
           .finally(() => setIsLoading(false));
       } else {
@@ -47,12 +48,9 @@ export const App = () => {
         return;
       }
     }
-  }, [page, q]);
+  }, [page, q, fetchError]);
 
-  useEffect(()=>{
-    if(fetchError !== null){
-    Notify.failure(`Houston we have some "${fetchError}" problems...`)}
-  },[fetchError])
+  
   
 
   
