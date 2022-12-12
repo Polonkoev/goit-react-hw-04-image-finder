@@ -18,42 +18,32 @@ export const App = () => {
   const [isShown, setIsShown] = useState(false);
   const [isLoadMore, setIsLoadMore] = useState(false);
   const [currentImage, setCurrentImage] = useState(null);
-  const [fetchError, setFetchError] = useState(null);
- 
+  
 
   useEffect(() => {
     if (page !== 1 || q !== '') {
-      if (q !== '') {
-        setIsLoading(true);
-  
-        fetchImages(page, q)
-          .then(({ data: { hits } }) => {
-            hits.length >= 12 ? setIsLoadMore(true) : setIsLoadMore(false);
-            hits.length === 0 && Notify.failure('Image note found..');
-            setResponse((response)=>[...response, ...imageMapper(hits)]);
-            setIsShown(true);
-            
-            
-          })
-          .catch(error => {
-            setFetchError(error.message);
-            setIsShown(false);
-            if(fetchError !== null){
-              Notify.failure(`Houston we have some "${fetchError}" problems...`)}
-          })
-          .finally(() => setIsLoading(false));
-      } else {
-        setIsLoadMore(false);
-  
+      if (q === '') {
         return;
       }
+      setIsLoading(true);
+
+      fetchImages(page, q)
+        .then(({ data: { hits } }) => {
+          hits.length >= 12 ? setIsLoadMore(true) : setIsLoadMore(false);
+          hits.length === 0 && Notify.failure('Image note found..');
+          setResponse(response => [...response, ...imageMapper(hits)]);
+          setIsShown(true);
+        })
+        .catch(error => {
+          
+          setIsShown(false);
+
+          Notify.failure(`Houston we have some "${error.message}" problems...`);
+        })
+        .finally(() => setIsLoading(false));
     }
-  }, [page, q, fetchError]);
+  }, [page, q]);
 
-  
-  
-
-  
   const dataHandler = data => {
     setQ(data);
     setPage(1);
@@ -61,22 +51,18 @@ export const App = () => {
     setIsShown(false);
     setIsLoadMore(false);
     setIsLoading(false);
-
-   
   };
 
   const nextPageHandler = () => {
     setPage(page + 1);
-
   };
 
   const openModal = data => {
-    
-    setCurrentImage(data)
+    setCurrentImage(data);
   };
 
   const closeModal = () => {
-  setCurrentImage (null);
+    setCurrentImage(null);
   };
 
   return (
